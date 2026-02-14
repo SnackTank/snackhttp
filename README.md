@@ -7,7 +7,7 @@ This project was designed for Java 1.8.0 <br>
 There are two diffrent ways, either A manually, or B with the provided script. <br>
 Here's the manual way if you don't trust my script: <br>
 I. Please go to the directory that contains net/ <br>
-You're file manager should show something along this file structure: <br>
+Your file manager should show something along this file structure: <br>
 'LICENSE MANIFEST.MF net README.md' <br>
 And go ahead and create an 'out' directory: mkdir out/ (Unix example) <br>
 II. run 'javac -d out/ net/snacktank/httpserver/\*.java' <br>
