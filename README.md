@@ -11,8 +11,9 @@ You're file manager should show something along this file structure: <br>
 'LICENSE MANIFEST.MF net README.md' <br>
 And go ahead and create an 'out' directory: mkdir out/ (Unix example) <br>
 II. run 'javac -d out/ net/snacktank/httpserver/\*.java' <br>
+CD into 'out/' <br>
 Now the server can be ran by 'java net/snacktank/httpserver/WebServer' but we want a Java Archive (JAR) file. <br>
-III. run 'jar -cfm WebServer.jar MANIFEST.MF net/snacktank/httpserver/\*.class net/snacktank/httpserver/request/*.class' <br>
+III. run 'jar -cfm WebServer.jar ../MANIFEST.MF net/snacktank/httpserver/\*.class net/snacktank/httpserver/request/*.class' <br>
 This sequence should create a JAR file that can be placed anywhere you want! 
 
 ## How to Run
