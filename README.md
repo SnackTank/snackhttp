@@ -1,42 +1,34 @@
-# SnackTank's Hypertext Transfer Protocol Server
-A stupid simple HTTP/1.0 server written in Java <br>
-Context? There is no context, it exist because it does. <br>
-This project was designed for Java 1.8.0 <br>
+<h1>SnackTank's Hypertext Transfer Protocol Server</h1>
+<p>
+A stupid simple HTTP/1.0 server written in Java 1.8.0 <br>
+This server is not intended to be used in production.
 
-## How to compile
-There are two diffrent ways, either A manually, or B with the provided script. <br>
-Here's the manual way if you don't trust my script: <br>
-I. Please go to the directory that contains net/ <br>
-Your file manager should show something along this file structure: <br>
-'LICENSE MANIFEST.MF net README.md' <br>
-And go ahead and create an 'out' directory: mkdir out/ (Unix example) <br>
-II. run 'javac -d out/ net/snacktank/httpserver/\*.java' <br>
-CD into 'out/' <br>
-Now the server can be ran by 'java net/snacktank/httpserver/WebServer' but we want a Java Archive (JAR) file. <br>
-III. run 'jar -cfm WebServer.jar ../MANIFEST.MF net/snacktank/httpserver/\*.class net/snacktank/httpserver/request/*.class' <br>
-This sequence should create a JAR file that can be placed anywhere you want! 
+<h2>How to compile</h2>
+Run the provided script
+<blockquote>
+	sh compile.sh
+</blockquote>
+Please note it only works on Unix systems.
 
-## How to Run
-It's pretty simple just do: <br>
-'java -jar WebServer.jar' <br>
-
-## Behaviors 
-POST & PUT are disabled by default. You will need to enable them in the source code. <br>
-If POST is enabled the request will be stored as plain ASCII in a request/ sub-folder. <br>
-If no file or '/' is requested by GET, the server will return 'index.html'
-
-## Features
-I.   GET  <br>
-II.  HEAD <br>
+<h2>Features</h2>
+I. GET <br>
+II. HEAD <br>
 III. POST <br>
-IV.  PUT  <br>
+IV. PUT <br>
+V. Multithreading
 
-## TODO
-I. [ ] LINK <br>
-II. [ ] UNLINK <br>
-III. [ ] DELETE <br>
-IV. [ ] AUTHENTICATION 
+<h2>Behaviors</h2>
+PUT is disabled by default, and POST is enabled by default. Both PUT and POST store files as ASCII only. Binary files are NOT supported at this time. POST requests most be done in the 'uploads' directory. The default file, if no file is requested (I.e. '/'), is index.html. 
 
-## License
+<h2>TODO</h2>
+I. LINK <br>
+II. UNLINK <br>
+III. DELETE <br>
+IV. AUTH <br>
+V. FRIENDLY CONFIG <br>
+VI. STABLE MULTITHREADING <br>
+
+<h2>License</h2>
 MIT <br>
 Copyright MMXXVI SnackTank
+</p>

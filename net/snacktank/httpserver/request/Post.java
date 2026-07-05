@@ -1,34 +1,47 @@
 package net.snacktank.httpserver.request;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.Socket;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.StringTokenizer;
 
 import net.snacktank.httpserver.WebServer;
 
-public class Post {
+public class Post extends Request{
+
+	public Post(BufferedReader in, DataOutputStream out, Socket connection, String msg) {
+		this.inFromClient = in;
+    	this.outToClient = out;
+    	this.connectionSocket = connection;
+    	this.requestMessage = msg;
+    	try {
+			postMain();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
-	String fileName;
-	
-	public Post() throws IOException {
+	public void postMain() throws IOException{
 		int bodyLength = 0;
 		boolean letThatFileIN = false;
-    	fileName = WebServer.tokenizedLine.nextToken();
-    	if(WebServer.method.equals("PUT") && WebServer.putEnable) {
+    	StringTokenizer tokenizedLine = new StringTokenizer(requestMessage);
+    	String method = tokenizedLine.nextToken();
+    	String fileName = tokenizedLine.nextToken();
+    	
+    	if(method.equals("PUT") && WebServer.putEnable) {
     		letThatFileIN = true;
     	}
-    	if (fileName.startsWith("/post/") == true || WebServer.method.equals("PUT")) {
-    		fileName  = fileName.substring(1);
+    	
+    	if (fileName.startsWith("/uploads/") == true || method.equals("PUT")) {
+    		fileName = fileName.substring(1);
     		String content;
-
-    		//Read request from client, and figure out length of body for parsing.
     		
     		while((content = WebServer.inFromClient.readLine()) != null) {
-    			/* TODO change file extension with content-type
-    			if(content.startsWith("Content-Type:")) {
-    				System.out.println(content);
-    			}
-    			*/
     			if(content.startsWith("Content-Length:")) {
     				//Find out how long the body is
     				bodyLength = Integer.parseInt(content.replaceAll("[^0-9]", ""));
@@ -38,24 +51,22 @@ public class Post {
     				break;
     			}
     		}
-
-    		//TODO Support any binary file
     		//Takes the BufferedInput into an array of chars to be stored.
     		String date = null;
     		char[] bodyChars = new char[bodyLength];
 			int readChars = 0;
 			while (readChars < bodyLength) {
-			    int r = WebServer.inFromClient.read(bodyChars, readChars, bodyLength - readChars);
+			    int r = inFromClient.read(bodyChars, readChars, bodyLength - readChars);
 			    readChars += r;
 			    if(r == -1) {
-			    	WebServer.SendStatus(500, true);
-			    	WebServer.connectionSocket.close();
+			    	sendStatus(500, true);
+			    	connectionSocket.close();
 	            	return;
 			    }
 			}
 			String toWrite = new String(bodyChars);
 			try {
-				if(WebServer.method.equals("POST")) {
+				if(method.equals("POST")) {
 					date = Long.toString(System.currentTimeMillis());
 					FileWriter writer = new FileWriter("uploads/request-" + date + ".txt");
 					writer.write(toWrite);
@@ -66,31 +77,21 @@ public class Post {
 					writer.close();
 				}
 			} catch(FileNotFoundException e) {
-				WebServer.SendStatus(400, true);
-				WebServer.connectionSocket.close();
+				sendStatus(400, true);
+				connectionSocket.close();
             	return;
 			}
-
-    		/*
-    		for(int i = 0; i < bodyLength; i++) {
-    			System.out.print(bodyChars[i]);
-    		}
-    		//To print the body of the POST request
-    		*/
-			String logName = null;
 			//To tell the client that the file has been created!
-			WebServer.SendStatus(201, false);		
-			if(WebServer.method.equals("POST")) {
-				WebServer.outToClient.writeBytes("Location: /uploads/request-" + date + ".txt\r\n");
-				logName = "Location: /uploads/request-" + date + ".txt\r\n";
+			sendStatus(201, false);		
+			if(method.equals("POST")) {
+				outToClient.writeBytes("Location: /uploads/request-" + date + ".txt\r\n");
 				} else if (letThatFileIN){
-				WebServer.outToClient.writeBytes("Location: " +"/" + fileName + "\r\n");
-				logName = "Location: " +"/" + fileName + "\r\n";
+				outToClient.writeBytes("Location: " +"/" + fileName + "\r\n");
 			}
-			WebServer.outToClient.writeBytes("\r\n");
-			System.out.println(WebServer.connectionSocket.getInetAddress() + " : " + logName);
-    	} else {
-    		WebServer.SendStatus(400, true);
+    		outToClient.writeBytes("Server: " + WebServer.name + "\r\n");
+    		outToClient.writeBytes("Date: " + ZonedDateTime.now(java.time.ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME) + "\r\n");
+			outToClient.writeBytes("\r\n");    		
     	}
+    	connectionSocket.close();
 	}
 }
